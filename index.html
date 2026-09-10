@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英雄联盟 · 全英雄阵营/地区图鉴（173 位 · 14 地区）</title>
+<style>
+  :root{
+    --bg:#0a0e17;
+    --bg2:#0f1524;
+    --panel:#131a2c;
+    --panel2:#182136;
+    --line:#263149;
+    --text:#e8edf5;
+    --muted:#8b96ad;
+    --gold:#c8aa6e;
+    --gold2:#f0e6d2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(200,170,110,.12), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(80,130,220,.10), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:"PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+    min-height:100vh;
+    padding:0 0 60px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1240px;margin:0 auto;padding:0 20px}
+  header{
+    padding:44px 0 18px;text-align:center;
+  }
+  header .kicker{
+    letter-spacing:.35em;color:var(--gold);font-size:12px;text-transform:uppercase;
+    opacity:.9;
+  }
+  header h1{
+    font-size:34px;font-weight:800;margin:10px 0 8px;
+    background:linear-gradient(180deg,#fff, #d9c08a);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  header p{color:var(--muted);font-size:14px;line-height:1.7}
+  header .stats{margin-top:14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .stat{
+    background:linear-gradient(180deg,var(--panel2),var(--panel));
+    border:1px solid var(--line);border-radius:10px;padding:8px 16px;font-size:13px;
+  }
+  .stat b{color:var(--gold2);font-size:16px;margin-right:4px}
+
+  /* toolbar */
+  .toolbar{
+    position:sticky;top:0;z-index:30;
+    background:rgba(10,14,23,.86);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+    padding:14px 0;margin-top:6px;
+  }
+  .toolbar-inner{max-width:1240px;margin:0 auto;padding:0 20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .search{
+    flex:1 1 260px;display:flex;align-items:center;gap:8px;
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;
+  }
+  .search input{
+    flex:1;background:none;border:none;outline:none;color:var(--text);font-size:14px;
+  }
+  .search input::placeholder{color:#5a6478}
+  .search svg{flex:none;opacity:.6}
+  .sortbtn{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    color:var(--text);padding:10px 14px;font-size:13px;cursor:pointer;
+  }
+  .sortbtn:hover{border-color:var(--gold)}
+  .clear{
+    display:none;background:none;border:1px solid var(--line);border-radius:8px;color:var(--muted);
+    padding:6px 10px;cursor:pointer;font-size:12px;
+  }
+  .clear.show{display:inline-block}
+  .clear:hover{color:var(--gold2);border-color:var(--gold)}
+
+  /* chips */
+  .chips{
+    display:flex;gap:8px;flex-wrap:wrap;padding:16px 0 6px;
+  }
+  .chip{
+    cursor:pointer;border:1px solid var(--line);border-radius:999px;
+    padding:7px 13px;font-size:13px;color:var(--muted);background:var(--panel);
+    transition:.15s;user-select:none;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .chip .dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.7}
+  .chip .n{font-size:11px;opacity:.65}
+  .chip:hover{border-color:var(--gold);color:var(--text)}
+  .chip.active{background:linear-gradient(180deg,var(--cc),#0000);border-color:var(--cc);color:#fff}
+  .chip.active .n{opacity:.95}
+
+  /* sections */
+  section{margin-top:26px}
+  .sec-head{
+    display:flex;align-items:center;gap:12px;margin:0 0 14px;padding-bottom:10px;
+    border-bottom:1px solid var(--line);
+  }
+  .sec-head .bar{width:6px;height:26px;border-radius:4px;background:var(--cc)}
+  .sec-head h2{font-size:20px;font-weight:800}
+  .sec-head .en{color:var(--muted);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+  .sec-head .cnt{margin-left:auto;color:var(--muted);font-size:13px}
+  .sec-head .cnt b{color:var(--cc);font-size:16px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:12px}
+  .card{
+    position:relative;border-radius:12px;overflow:hidden;cursor:pointer;
+    background:var(--panel);border:1px solid var(--line);
+    transition:.18s transform,.18s border-color,.18s box-shadow;
+    aspect-ratio: 3/4;
+  }
+  .card:hover{
+    transform:translateY(-4px);
+    border-color:var(--cc);
+    box-shadow:0 10px 30px -10px var(--cc);
+  }
+  .card .avatar{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    background:
+      radial-gradient(120% 80% at 50% 0%, var(--cc) 0%, #0000 60%),
+      linear-gradient(180deg,var(--panel2),var(--panel));
+    font-size:56px;font-weight:800;color:#ffffff55;
+  }
+  .card img{
+    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;
+    transition:.25s;
+  }
+  .card:hover img{transform:scale(1.05)}
+  .card .scrim{
+    position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(8,10,18,0) 38%, rgba(8,10,18,.92) 100%);
+  }
+  .card .info{position:absolute;left:10px;right:10px;bottom:9px;z-index:3}
+  .card .title{font-size:11px;color:var(--cc);letter-spacing:.05em;margin-bottom:2px;font-weight:600}
+  .card .name{font-size:17px;font-weight:800;line-height:1.2}
+  .card .en{font-size:11px;color:var(--muted);margin-top:2px}
+  .card .tag{
+    position:absolute;top:8px;right:8px;z-index:3;font-size:10px;padding:3px 7px;border-radius:6px;
+    background:rgba(8,10,18,.7);border:1px solid var(--cc);color:#fff;
+  }
+  .card .region-badge{
+    position:absolute;top:8px;left:8px;z-index:3;font-size:10px;padding:3px 7px;border-radius:6px;
+    background:var(--cc);color:#0a0e17;font-weight:700;
+  }
+
+  .empty{
+    text-align:center;color:var(--muted);padding:60px 20px;font-size:14px;
+  }
+
+  /* modal */
+  .modal{
+    position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
+    background:rgba(5,8,14,.8);backdrop-filter:blur(6px);padding:20px;
+  }
+  .modal.show{display:flex}
+  .modal-box{
+    width:min(760px,100%);max-height:92vh;overflow:auto;
+    background:var(--bg2);border:1px solid var(--line);border-radius:16px;
+    display:grid;grid-template-columns:280px 1fr;
+  }
+  @media(max-width:640px){.modal-box{grid-template-columns:1fr}}
+  .modal-img{position:relative;min-height:320px;background:var(--panel)}
+  .modal-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top}
+  .modal-body{padding:26px}
+  .modal-body .rname{font-size:12px;letter-spacing:.2em;color:var(--cc);text-transform:uppercase;margin-bottom:6px}
+  .modal-body h3{font-size:30px;font-weight:800;margin-bottom:2px}
+  .modal-body .title{color:var(--muted);font-size:14px;margin-bottom:4px}
+  .modal-body .en{color:var(--gold2);font-size:13px;margin-bottom:16px}
+  .modal-body .row{font-size:13px;color:var(--text);margin:8px 0;display:flex;gap:10px;align-items:center}
+  .modal-body .row .k{color:var(--muted);width:66px;flex:none}
+  .modal-body .pill{display:inline-block;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px}
+  .modal-close{
+    position:absolute;top:12px;right:12px;z-index:5;width:34px;height:34px;border-radius:50%;
+    background:rgba(8,10,18,.7);border:1px solid var(--line);color:var(--text);font-size:18px;cursor:pointer;
+  }
+  .modal-close:hover{border-color:var(--gold)}
+  footer{
+    margin-top:50px;color:#5a6478;font-size:12px;line-height:1.9;border-top:1px solid var(--line);padding-top:20px;
+  }
+  footer a{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">League of Legends · Runeterra</div>
+    <h1>英雄联盟全英雄阵营 / 地区图鉴</h1>
+    <p>收录端游《英雄联盟》全部 <b id="total">173</b> 位英雄，按官方《英雄联盟》宇宙划分的 <b>14</b> 个地区整理。<br>
+      点击卡片查看详情，可用搜索框与地区标签快速筛选。</p>
+    <div class="stats" id="stats"></div>
+  </header>
+</div>
+
+<div class="toolbar">
+  <div class="toolbar-inner">
+    <div class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="search" type="text" placeholder="搜索英雄中文名 / 英文名 / 称号…（如：亚索、Yasuo、暗裔、光之哨兵）">
+    </div>
+    <button class="sortbtn" id="sortBtn" title="切换浏览方式">浏览方式：按地区分组</button>
+    <button class="clear" id="clearBtn">清除筛选</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="chips" id="chips"></div>
+  <div id="content"></div>
+  <div class="empty" id="empty" style="display:none">没有找到匹配的英雄，换个关键词试试吧。</div>
+
+  <footer>
+    <b>说明</b>：地区划分以《英雄联盟》宇宙官网（yz.lol.qq.com）为准；“符文之地”指无固定地区、四处游历或宇宙/恶魔等存在；
+    “暗裔”“光之哨兵”“恶魔”为跨地区的阵营标签。<br>
+    数据截至 2026 年 9 月 9 日（最新英雄为「灰烬驱魔人·洛克」）。诺拉（Norra）为《英雄联盟手游》专属英雄，未计入端游名单。<br>
+    英雄立绘来自 Riot Games 官方 CDN（Data Dragon）；本页面仅供学习参考，英雄联盟及相关内容版权归拳头游戏（Riot Games）所有。
+  </footer>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-img"><button class="modal-close" id="modalClose">✕</button><img id="mImg" alt=""></div>
+    <div class="modal-body">
+      <div class="rname" id="mRegion">—</div>
+      <h3 id="mName">—</h3>
+      <div class="title" id="mTitle">—</div>
+      <div class="en" id="mEn">—</div>
+      <div class="row"><span class="k">称号</span><span class="pill" id="mTitle2">—</span></div>
+      <div class="row"><span class="k">地区</span><span class="pill" id="mRegion2">—</span></div>
+      <div class="row"><span class="k">阵营</span><span class="pill" id="mFaction">—</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ 数据（官方《英雄联盟》宇宙地区划分） ============ */
+/* 每条: [中文名, 英文名, 中文称号, 地区key, DataDragon头像id, 阵营(可空)] */
+const RAW = [
+// —— 德玛西亚 Demacia ——
+["菲奥娜","Fiora","无双剑姬","demacia","Fiora",""],
+["加里奥","Galio","正义巨像","demacia","Galio",""],
+["盖伦","Garen","德玛西亚之力","demacia","Garen",""],
+["嘉文四世","Jarvan IV","德玛西亚皇子","demacia","JarvanIV",""],
+["凯尔","Kayle","正义天使","demacia","Kayle",""],
+["洛克","Locke","灰烬驱魔人","demacia","Locke",""],
+["拉克丝","Lux","光辉女郎","demacia","Lux",""],
+["莫甘娜","Morgana","堕落天使","demacia","Morgana",""],
+["波比","Poppy","圣锤之毅","demacia","Poppy",""],
+["奎因","Quinn","德玛西亚之翼","demacia","Quinn",""],
+["希瓦娜","Shyvana","龙血武姬","demacia","Shyvana",""],
+["娑娜","Sona","琴瑟仙女","demacia","Sona",""],
+["塞拉斯","Sylas","解脱者","demacia","Sylas",""],
+["薇恩","Vayne","暗夜猎手","demacia","Vayne","光之哨兵"],
+["赵信","Xin Zhao","德邦总管","demacia","XinZhao",""],
+// —— 诺克萨斯 Noxus ——
+["安蓓萨","Ambessa","铁血狼母","noxus","Ambessa",""],
+["贝蕾亚","Briar","狂厄蔷薇","noxus","Briar",""],
+["卡西奥佩娅","Cassiopeia","魔蛇之拥","noxus","Cassiopeia",""],
+["德莱厄斯","Darius","诺克萨斯之手","noxus","Darius",""],
+["德莱文","Draven","荣耀行刑官","noxus","Draven",""],
+["卡特琳娜","Katarina","不祥之刃","noxus","Katarina",""],
+["克烈","Kled","暴怒骑士","noxus","Kled",""],
+["乐芙兰","LeBlanc","诡术妖姬","noxus","Leblanc",""],
+["梅尔","Mel","流光镜影","noxus","Mel",""],
+["莫德凯撒","Mordekaiser","铁铠冥魂","noxus","Mordekaiser",""],
+["芮尔","Rell","熔铁少女","noxus","Rell",""],
+["锐雯","Riven","放逐之刃","noxus","Riven",""],
+["莎弥拉","Samira","沙漠玫瑰","noxus","Samira",""],
+["赛恩","Sion","亡灵战神","noxus","Sion",""],
+["斯维因","Swain","诺克萨斯统领","noxus","Swain",""],
+["泰隆","Talon","刀锋之影","noxus","Talon",""],
+["弗拉基米尔","Vladimir","猩红收割者","noxus","Vladimir",""],
+// —— 艾欧尼亚 Ionia ——
+["阿狸","Ahri","九尾妖狐","ionia","Ahri",""],
+["阿卡丽","Akali","离群之刺","ionia","Akali",""],
+["彗","Hwei","异画师","ionia","Hwei",""],
+["艾瑞莉娅","Irelia","刀锋舞者","ionia","Irelia",""],
+["艾翁","Ivern","翠神","ionia","Ivern",""],
+["烬","Jhin","戏命师","ionia","Jhin",""],
+["卡尔玛","Karma","天启者","ionia","Karma",""],
+["凯隐","Kayn","影流之镰","ionia","Kayn","暗裔·拉亚斯特"],
+["凯南","Kennen","狂暴之心","ionia","Kennen",""],
+["李青","Lee Sin","盲僧","ionia","LeeSin",""],
+["莉莉娅","Lillia","含羞蓓蕾","ionia","Lillia",""],
+["易","Master Yi","无极剑圣","ionia","MasterYi",""],
+["洛","Rakan","幻翎","ionia","Rakan",""],
+["瑟提","Sett","腕豪","ionia","Sett",""],
+["慎","Shen","暮光之眼","ionia","Shen",""],
+["辛德拉","Syndra","暗黑元首","ionia","Syndra",""],
+["韦鲁斯","Varus","惩戒之箭","ionia","Varus","暗裔"],
+["孙悟空","Wukong","齐天大圣","ionia","MonkeyKing",""],
+["霞","Xayah","逆羽","ionia","Xayah",""],
+["亚索","Yasuo","疾风剑豪","ionia","Yasuo",""],
+["永恩","Yone","封魔剑魂","ionia","Yone",""],
+["芸阿娜","Yunara","不破之誓","ionia","Yunara",""],
+["劫","Zed","影流之主","ionia","Zed",""],
+// —— 皮尔特沃夫 Piltover ——
+["凯特琳","Caitlyn","皮城女警","piltover","Caitlyn",""],
+["卡蜜尔","Camille","青钢影","piltover","Camille",""],
+["伊泽瑞尔","Ezreal","探险家","piltover","Ezreal",""],
+["黑默丁格","Heimerdinger","大发明家","piltover","Heimerdinger",""],
+["杰斯","Jayce","未来守护者","piltover","Jayce",""],
+["奥莉安娜","Orianna","发条魔灵","piltover","Orianna",""],
+["萨勒芬妮","Seraphine","星籁歌姬","piltover","Seraphine",""],
+["蔚","Vi","皮城执法官","piltover","Vi",""],
+// —— 祖安 Zaun ——
+["布里茨","Blitzcrank","蒸汽机器人","zaun","Blitzcrank",""],
+["蒙多医生","Dr. Mundo","祖安狂人","zaun","DrMundo",""],
+["艾克","Ekko","时间刺客","zaun","Ekko",""],
+["迦娜","Janna","风暴之怒","zaun","Janna",""],
+["金克丝","Jinx","暴走萝莉","zaun","Jinx",""],
+["烈娜塔·戈拉斯克","Renata Glasc","炼金男爵","zaun","Renata",""],
+["辛吉德","Singed","炼金术士","zaun","Singed",""],
+["图奇","Twitch","瘟疫之源","zaun","Twitch",""],
+["厄加特","Urgot","无畏战车","zaun","Urgot",""],
+["维克托","Viktor","奥术先驱","zaun","Viktor",""],
+["沃里克","Warwick","祖安怒兽","zaun","Warwick",""],
+["扎克","Zac","生化魔人","zaun","Zac",""],
+["泽丽","Zeri","祖安花火","zaun","Zeri",""],
+["吉格斯","Ziggs","爆破鬼才","zaun","Ziggs",""],
+// —— 弗雷尔卓德 Freljord ——
+["艾尼维亚","Anivia","冰晶凤凰","freljord","Anivia",""],
+["艾希","Ashe","寒冰射手","freljord","Ashe",""],
+["阿萝拉","Aurora","双界灵兔","freljord","Aurora",""],
+["布隆","Braum","弗雷尔卓德之心","freljord","Braum",""],
+["纳尔","Gnar","迷失之牙","freljord","Gnar",""],
+["古拉加斯","Gragas","酒桶","freljord","Gragas",""],
+["丽桑卓","Lissandra","冰霜女巫","freljord","Lissandra",""],
+["努努和威朗普","Nunu & Willump","雪原双子","freljord","Nunu",""],
+["奥拉夫","Olaf","狂战士","freljord","Olaf",""],
+["奥恩","Ornn","山隐之焰","freljord","Ornn",""],
+["瑟庄妮","Sejuani","北地之怒","freljord","Sejuani",""],
+["特朗德尔","Trundle","巨魔之王","freljord","Trundle",""],
+["泰达米尔","Tryndamere","蛮族之王","freljord","Tryndamere",""],
+["乌迪尔","Udyr","兽灵行者","freljord","Udyr",""],
+["沃利贝尔","Volibear","不灭狂雷","freljord","Volibear",""],
+// —— 恕瑞玛 Shurima ——
+["阿克尚","Akshan","影哨","shurima","Akshan","光之哨兵"],
+["阿木木","Amumu","殇之木乃伊","shurima","Amumu",""],
+["阿兹尔","Azir","沙漠皇帝","shurima","Azir",""],
+["奎桑提","K'Sante","纳祖芒荣耀","shurima","KSante",""],
+["纳亚菲利","Naafiri","百裂冥犬","shurima","Naafiri","暗裔"],
+["内瑟斯","Nasus","沙漠死神","shurima","Nasus",""],
+["拉莫斯","Rammus","披甲龙龟","shurima","Rammus",""],
+["雷克顿","Renekton","荒漠屠夫","shurima","Renekton",""],
+["希维尔","Sivir","战争女神","shurima","Sivir",""],
+["塔莉垭","Taliyah","岩雀","shurima","Taliyah",""],
+["泽拉斯","Xerath","远古巫灵","shurima","Xerath",""],
+// —— 比尔吉沃特 Bilgewater ——
+["普朗克","Gangplank","海洋之灾","bilgewater","Gangplank",""],
+["格雷福斯","Graves","法外狂徒","bilgewater","Graves",""],
+["俄洛伊","Illaoi","海兽祭司","bilgewater","Illaoi",""],
+["厄运小姐","Miss Fortune","赏金猎人","bilgewater","MissFortune",""],
+["诺提勒斯","Nautilus","深海泰坦","bilgewater","Nautilus",""],
+["尼菈","Nilah","不羁之悦","bilgewater","Nilah",""],
+["派克","Pyke","血港鬼影","bilgewater","Pyke",""],
+["崔斯特","Twisted Fate","卡牌大师","bilgewater","TwistedFate",""],
+// —— 暗影岛 Shadow Isles ——
+["伊莉丝","Elise","蜘蛛女皇","shadowisles","Elise",""],
+["格温","Gwen","灵罗娃娃","shadowisles","Gwen",""],
+["赫卡里姆","Hecarim","战争之影","shadowisles","Hecarim",""],
+["卡莉丝塔","Kalista","复仇之矛","shadowisles","Kalista",""],
+["卡尔萨斯","Karthus","死亡颂唱者","shadowisles","Karthus",""],
+["茂凯","Maokai","扭曲树精","shadowisles","Maokai",""],
+["锤石","Thresh","魂锁典狱长","shadowisles","Thresh",""],
+["薇古丝","Vex","愁云使者","shadowisles","Vex",""],
+["佛耶戈","Viego","破败之王","shadowisles","Viego",""],
+["约里克","Yorick","牧魂人","shadowisles","Yorick",""],
+// —— 班德尔城 Bandle City ——
+["库奇","Corki","英勇投弹手","bandlecity","Corki",""],
+["璐璐","Lulu","仙灵女巫","bandlecity","Lulu",""],
+["兰博","Rumble","机械公敌","bandlecity","Rumble",""],
+["提莫","Teemo","迅捷斥候","bandlecity","Teemo",""],
+["崔丝塔娜","Tristana","麦林炮手","bandlecity","Tristana",""],
+["维迦","Veigar","邪恶小法师","bandlecity","Veigar",""],
+["悠米","Yuumi","魔法猫咪","bandlecity","Yuumi",""],
+// —— 巨神峰 Targon ——
+["厄斐琉斯","Aphelios","残月之肃","targon","Aphelios",""],
+["黛安娜","Diana","皎月女神","targon","Diana",""],
+["蕾欧娜","Leona","曙光女神","targon","Leona",""],
+["潘森","Pantheon","不屈之枪","targon","Pantheon",""],
+["索拉卡","Soraka","众星之子","targon","Soraka",""],
+["塔里克","Taric","瓦洛兰之盾","targon","Taric",""],
+["佐伊","Zoe","暮光星灵","targon","Zoe",""],
+// —— 以绪塔尔 Ixtal ——
+["墨菲特","Malphite","熔岩巨兽","ixtal","Malphite",""],
+["米利欧","Milio","温柔烈焰","ixtal","Milio",""],
+["妮蔻","Neeko","万花通灵","ixtal","Neeko",""],
+["奈德丽","Nidalee","狂野女猎手","ixtal","Nidalee",""],
+["奇亚娜","Qiyana","元素女皇","ixtal","Qiyana",""],
+["雷恩加尔","Rengar","傲之追猎者","ixtal","Rengar",""],
+["斯卡纳","Skarner","上古领主","ixtal","Skarner",""],
+["婕拉","Zyra","荆棘之兴","ixtal","Zyra",""],
+// —— 虚空之地 The Void ——
+["卑尔维斯","Bel'Veth","虚空女皇","void","Belveth",""],
+["科加斯","Cho'Gath","虚空恐惧","void","Chogath",""],
+["卡莎","Kai'Sa","虚空之女","void","Kaisa",""],
+["卡萨丁","Kassadin","虚空行者","void","Kassadin",""],
+["卡兹克","Kha'Zix","虚空掠夺者","void","Khazix",""],
+["克格莫","Kog'Maw","深渊巨口","void","KogMaw",""],
+["玛尔扎哈","Malzahar","虚空先知","void","Malzahar",""],
+["雷克塞","Rek'Sai","虚空遁地兽","void","Reksai",""],
+["维克兹","Vel'Koz","虚空之眼","void","Velkoz",""],
+// —— 符文之地 Runeterra ——
+["亚托克斯","Aatrox","暗裔剑魔","runeterra","Aatrox","暗裔"],
+["阿利斯塔","Alistar","牛头酋长","runeterra","Alistar",""],
+["安妮","Annie","黑暗之女","runeterra","Annie",""],
+["奥瑞利安·索尔","Aurelion Sol","铸星龙王","runeterra","AurelionSol",""],
+["巴德","Bard","星界游神","runeterra","Bard",""],
+["布兰德","Brand","复仇焰魂","runeterra","Brand",""],
+["伊芙琳","Evelynn","痛苦之拥","runeterra","Evelynn","恶魔"],
+["费德提克","Fiddlesticks","远古恐惧","runeterra","Fiddlesticks","恶魔"],
+["菲兹","Fizz","潮汐海灵","runeterra","Fizz",""],
+["贾克斯","Jax","武器大师","runeterra","Jax",""],
+["千珏","Kindred","永猎双子","runeterra","Kindred",""],
+["卢锡安","Lucian","圣枪游侠","runeterra","Lucian","光之哨兵"],
+["娜美","Nami","唤潮鲛姬","runeterra","Nami",""],
+["魔腾","Nocturne","永恒梦魇","runeterra","Nocturne","恶魔"],
+["瑞兹","Ryze","符文法师","runeterra","Ryze",""],
+["赛娜","Senna","涤魂圣枪","runeterra","Senna","光之哨兵"],
+["萨科","Shaco","恶魔小丑","runeterra","Shaco","恶魔"],
+["斯莫德","Smolder","幼焰","runeterra","Smolder",""],
+["塔姆·肯奇","Tahm Kench","河流之王","runeterra","TahmKench","恶魔"],
+["基兰","Zilean","时光守护者","runeterra","Zilean",""],
+["亚恒","Zaahen","不落魔锋","runeterra","Zaahen","暗裔"],
+];
+
+const REGIONS = {
+  demacia:    { name:"德玛西亚",   en:"Demacia",      color:"#4b8bdf" },
+  noxus:      { name:"诺克萨斯",   en:"Noxus",        color:"#c1443e" },
+  ionia:      { name:"艾欧尼亚",   en:"Ionia",        color:"#c17a9a" },
+  piltover:   { name:"皮尔特沃夫", en:"Piltover",     color:"#c9a84a" },
+  zaun:       { name:"祖安",       en:"Zaun",         color:"#7abd63" },
+  freljord:   { name:"弗雷尔卓德", en:"Freljord",     color:"#7eb6d1" },
+  shurima:    { name:"恕瑞玛",     en:"Shurima",      color:"#d9a441" },
+  bilgewater: { name:"比尔吉沃特", en:"Bilgewater",   color:"#8b6f5a" },
+  shadowisles:{ name:"暗影岛",     en:"Shadow Isles", color:"#3b8a6e" },
+  bandlecity: { name:"班德尔城",   en:"Bandle City",  color:"#b8a0d8" },
+  targon:     { name:"巨神峰",     en:"Targon",       color:"#7d6bb8" },
+  ixtal:      { name:"以绪塔尔",   en:"Ixtal",        color:"#4e9b77" },
+  void:       { name:"虚空之地",   en:"The Void",     color:"#8b5aa8" },
+  runeterra:  { name:"符文之地",   en:"Runeterra",    color:"#9aa3ab" },
+};
+const ORDER = ["demacia","noxus","ionia","piltover","zaun","freljord","shurima","bilgewater","shadowisles","bandlecity","targon","ixtal","void","runeterra"];
+
+const DATA = RAW.map(r => ({ cn:r[0], en:r[1], title:r[2], region:r[3], id:r[4], faction:r[5] }));
+const IMG_BASE = "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/";
+
+let state = { region:"all", q:"", sort:"group" }; // sort: group | name
+
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+function buildStats(){
+  const el = document.getElementById("stats");
+  el.innerHTML = `
+    <div class="stat"><b>${DATA.length}</b>位英雄</div>
+    <div class="stat"><b>${ORDER.length}</b>个地区</div>
+    <div class="stat"><b>暗裔</b>亚托克斯 / 韦鲁斯 / 纳亚菲利 / 亚恒 / 凯隐</div>`;
+}
+
+function buildChips(){
+  const wrap = document.getElementById("chips");
+  let html = `<span class="chip ${state.region==='all'?'active':''}" data-r="all" style="--cc:#c8aa6e"><span class="dot"></span>全部<span class="n">${DATA.length}</span></span>`;
+  for(const k of ORDER){
+    const r = REGIONS[k];
+    const n = DATA.filter(d=>d.region===k).length;
+    html += `<span class="chip ${state.region===k?'active':''}" data-r="${k}" style="--cc:${r.color}"><span class="dot"></span>${r.name}<span class="n">${n}</span></span>`;
+  }
+  wrap.innerHTML = html;
+}
+
+function cardHTML(d, showRegionBadge){
+  const r = REGIONS[d.region];
+  return `
+  <div class="card" data-en="${esc(d.en)}" style="--cc:${r.color}">
+    <div class="avatar">${esc(d.cn[0])}</div>
+    <img loading="lazy" src="${IMG_BASE}${d.id}_0.jpg" alt="${esc(d.cn)}" onerror="this.style.display='none'">
+    <div class="scrim"></div>
+    ${showRegionBadge ? `<span class="region-badge">${esc(r.name)}</span>` : ''}
+    ${d.faction ? `<span class="tag">${esc(d.faction)}</span>` : ''}
+    <div class="info">
+      <div class="title">${esc(d.title)}</div>
+      <div class="name">${esc(d.cn)}</div>
+      <div class="en">${esc(d.en)}</div>
+    </div>
+  </div>`;
+}
+
+function match(d){
+  if(state.region !== "all" && d.region !== state.region) return false;
+  if(state.q){
+    const q = state.q.toLowerCase();
+    const hay = (d.cn + " " + d.en + " " + d.title + " " + (d.faction||"") + " " + REGIONS[d.region].name + " " + REGIONS[d.region].en).toLowerCase();
+    if(!hay.includes(q)) return false;
+  }
+  return true;
+}
+
+function render(){
+  const c = document.getElementById("content");
+  const empty = document.getElementById("empty");
+  const list = DATA.filter(match);
+  empty.style.display = list.length ? "none" : "block";
+
+  if(state.sort === "name"){
+    const sorted = [...list].sort((a,b)=>a.cn.localeCompare(b.cn,'zh-Hans-CN'));
+    c.innerHTML = `<section><div class="sec-head"><span class="bar" style="--cc:#c8aa6e"></span><h2>按名称排序</h2><span class="cnt"><b>${sorted.length}</b> 位</span></div><div class="grid">${sorted.map(d=>cardHTML(d,true)).join('')}</div></section>`;
+  } else {
+    let html = "";
+    for(const k of ORDER){
+      const subs = list.filter(d=>d.region===k);
+      if(!subs.length) continue;
+      const r = REGIONS[k];
+      html += `<section>
+        <div class="sec-head">
+          <span class="bar" style="--cc:${r.color}"></span>
+          <h2>${r.name}</h2><span class="en">${r.en}</span>
+          <span class="cnt"><b>${subs.length}</b> / ${DATA.filter(d=>d.region===k).length} 位</span>
+        </div>
+        <div class="grid">${subs.map(d=>cardHTML(d,false)).join('')}</div>
+      </section>`;
+    }
+    c.innerHTML = html || "";
+  }
+}
+
+function openModal(en){
+  const d = DATA.find(x=>x.en===en); if(!d) return;
+  const r = REGIONS[d.region];
+  document.getElementById("mImg").src = IMG_BASE + d.id + "_0.jpg";
+  document.getElementById("mImg").onerror = function(){ this.style.display="none"; };
+  document.getElementById("mImg").style.display = "";
+  document.getElementById("mRegion").textContent = r.name;
+  document.getElementById("mRegion").style.color = r.color;
+  document.getElementById("mName").textContent = d.cn;
+  document.getElementById("mTitle").textContent = "「" + d.title + "」";
+  document.getElementById("mEn").textContent = d.en;
+  document.getElementById("mTitle2").textContent = d.title;
+  document.getElementById("mRegion2").textContent = r.name + " · " + r.en;
+  document.getElementById("mFaction").textContent = d.faction || "（无特定阵营）";
+  document.getElementById("modal").classList.add("show");
+}
+function closeModal(){ document.getElementById("modal").classList.remove("show"); }
+
+/* events */
+document.getElementById("chips").addEventListener("click", e=>{
+  const chip = e.target.closest(".chip"); if(!chip) return;
+  state.region = chip.dataset.r;
+  buildChips(); render();
+});
+document.getElementById("search").addEventListener("input", e=>{
+  state.q = e.target.value.trim();
+  document.getElementById("clearBtn").classList.toggle("show", !!state.q || state.region!=="all");
+  render();
+});
+document.getElementById("sortBtn").addEventListener("click", e=>{
+  state.sort = state.sort==="group" ? "name" : "group";
+  e.target.textContent = "浏览方式：" + (state.sort==="group" ? "按地区分组" : "按名称排序");
+  render();
+});
+document.getElementById("clearBtn").addEventListener("click", ()=>{
+  state.q = ""; state.region = "all";
+  document.getElementById("search").value = "";
+  document.getElementById("clearBtn").classList.remove("show");
+  buildChips(); render();
+});
+document.getElementById("content").addEventListener("click", e=>{
+  const card = e.target.closest(".card"); if(card) openModal(card.dataset.en);
+});
+document.getElementById("modalClose").addEventListener("click", closeModal);
+document.getElementById("modal").addEventListener("click", e=>{ if(e.target.id==="modal") closeModal(); });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeModal(); });
+
+buildStats();
+buildChips();
+render();
+</script>
+</body>
+</html>
